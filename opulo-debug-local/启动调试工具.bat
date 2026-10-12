@@ -5,7 +5,7 @@ cd /d "%~dp0"
 set PORT=8321
 
 echo ==========================================
-echo   LumenPnP 本地调试工具 一键启动 (零依赖)
+echo   LumenPnP 硬件调试台 v2.0.0 一键启动 (零依赖)
 echo ==========================================
 echo 无需安装 Python 或任何软件,Windows 自带即可。
 echo.
@@ -24,6 +24,7 @@ timeout /t 2 /nobreak >nul
 start "" "http://localhost:%PORT%"
 
 echo.
-echo 已打开: http://localhost:%PORT%
+echo 已打开 主页面(硬件调试台): http://localhost:%PORT%/
+echo 可备用 官方镜像(可回退):   http://localhost:%PORT%/legacy/
 echo 关闭最小化窗口「LumenPnP Server」即停止服务。
 timeout /t 5 >nul

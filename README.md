@@ -1,46 +1,43 @@
-# LumenPnP 调试工具 - 本地离线版
+# LumenPnP 本地调试工具
 
-[Opulo LumenPnP 贴片机官方调试工具](https://debug.opulo.io/) 的本地离线镜像，并做了中文增强。**零依赖**——无需安装 Python、Node 或任何软件，Windows 10/11 双击即用。
+[Opulo LumenPnP](https://opulo.io/)（开源贴片机，国内常称"青蛙"）的本地离线调试工具，全中文界面。**零依赖**——无需安装 Python、Node 或任何软件，Windows 10/11 双击即用。
 
-## 功能
+## 内容
 
-- **完整离线镜像**：与线上版功能 100% 一致（Control 控制、Feeder 供料器编程、TMC 驱动测试、真空传感器测试、G 代码 REPL）
-- **中英文切换**：右下角「中 / EN」按钮一键切换，自动记忆偏好（localStorage）
-- **弹窗汉化**：所有提示弹窗（连接失败、编程结果、固件版本等）自动翻译
-- **零依赖启动**：用 Windows 自带 PowerShell 实现本地静态服务器（`server.ps1`）
+| 目录 | 说明 |
+|------|------|
+| [opulo-debug-local](opulo-debug-local) | **硬件调试台 v2.0.0**（自研单页，11 个面板）+ 官方 debug.opulo.io 离线镜像（`legacy/`）+ 零依赖启动器 |
 
-## 使用方法
-
-1. 双击 **启动调试工具.bat**
-2. 浏览器自动打开 <http://localhost:8321/>
-3. 用 USB 线连接贴片机主板并上电
-4. 点左上角 **连接 / Connect**，在浏览器弹窗中选择对应 COM 口
-5. 即可使用回原点、点动、真空测试、供料器扫描编程等功能
-
-> 必须使用 **Chrome 或 Edge** 浏览器（串口通信依赖 WebSerial API，Firefox 不支持）。
-> 不要直接双击 index.html 打开（file:// 协议下 WebSerial 不可用）。
-
-## 文件结构
+## 快速开始
 
 ```
-opulo-debug-local/
-├── 启动调试工具.bat    # 一键启动（自动清理端口 → 起服务器 → 开浏览器）
-├── server.ps1          # 零依赖静态服务器（PowerShell 实现）
-├── index.html          # 页面（含中英切换脚本）
-└── assets/             # 原站 JS/CSS/图片（未改动，保证功能一致）
+cd opulo-debug-local
 ```
 
-## 常见问题
+双击 **启动调试工具.bat**，浏览器会自动打开 <http://localhost:8321/>。
 
-| 问题 | 解决方法 |
-|------|---------|
-| 提示「无法写入串口」 | 先点「连接」选好 COM 口再操作 |
-| 连接弹窗里没有 COM 口 | 检查 USB 线（需数据线）、机器是否上电；老主板装 CH340/CP2102 驱动 |
-| 端口被占用 | bat 会自动结束占用进程；也可手动关闭旧的「LumenPnP Server」窗口 |
-| 页面空白 | 确认通过 http://localhost:8321/ 访问，按 Ctrl+F5 强制刷新 |
-| Marlin 不支持 Photon 协议 | 按[官方教程](https://docs.opulo.io/byop/motherboard/update-firmware/)升级固件 |
+- 主页面：<http://localhost:8321/> —— 硬件调试台 v2.0.0
+- 官方镜像：<http://localhost:8321/legacy/> —— 官方工具原样离线版 + 中英切换
 
-## 致谢与来源
+必须使用 **Chrome 或 Edge**（串口和摄像头依赖 WebSerial / MediaDevices）。不要直接双击 index.html——`file://` 协议下串口与摄像头都不可用。
 
-- 原工具：[Opulo](https://opulo.io/) 的 [debug.opulo.io](https://debug.opulo.io/)（属 Opulo 所有）
-- 本仓库仅做本地化部署与中文界面增强，供 LumenPnP 用户离线调试使用
+想先熟悉界面可以选 **演示 · 不连接硬件**，所有面板都能操作，由内置的虚拟控制器和虚拟供料器总线应答，不会发出任何真实指令。
+
+## 能做什么
+
+- **运动**：方向盘式 XY 点动、Z 轴点动、键盘点动（方向键 / WASD + PageUp / PageDown，按住连动）、回零、位置预设一键前往、软件急停（M410 保持连接 + M118 重同步）
+- **输出**：上下环形灯（可联动或独立）、左右气泵与阀门，力度 0–255 可调
+- **视觉**：上下双 USB 摄像头同时预览、旋转、镜像、十字线、截图
+- **供料器**：Photon / RS485 总线 —— 扫描 1–50 号位、编程卡位向导、闪灯定位、单播 / 广播 / 自定义数据包 / 校验和工具
+- **自检**：TMC 步进驱动检测（M122）、真空传感器 24 位读数、官方启动序列，报告均可导出
+- **终端**：手动 G-code、自定义宏（支持当前坐标与步长占位符）、收发日志
+
+不勾选「允许硬件控制」时任何会动硬件的按钮都点不动；连接时不会自动发送任何指令。
+
+详见 [opulo-debug-local/README.md](opulo-debug-local/README.md)。
+
+## 来源与致谢
+
+- 官方工具：[Opulo](https://opulo.io/) 的 [debug.opulo.io](https://debug.opulo.io/)（属 Opulo 所有），原样保存在 `opulo-debug-local/legacy/`
+- Photon 供料器协议的帧格式与校验和算法取自官方工具打包产物，已用 20 万组随机向量交叉验证，逐位一致
+- 本仓库做本地化部署、中文界面、能力合并与缺陷修正，供 LumenPnP / 青蛙贴片机用户离线调试使用

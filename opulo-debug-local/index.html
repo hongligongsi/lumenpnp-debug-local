@@ -1,279 +1,44 @@
 <!doctype html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/assets/lumen-icon-wA_suQRQ.png">
-  <link rel="shortcut icon" type="image/x-icon" href="/assets/lumen-icon-wA_suQRQ.png">
-  <title>LumenPnP Debug</title>
-  <script type="module" crossorigin src="/assets/index-qQ3PqOnW.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-lY3jZAel.css">
-</head>
-
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light"><title>LumenPnP · 硬件调试台</title><script>try{document.documentElement.dataset.theme=localStorage.getItem('lumen-bench-theme')==='light'?'light':'dark';}catch{document.documentElement.dataset.theme='dark';}</script><link rel="stylesheet" href="style.css?v=2.0.0"><script defer src="core.js?v=2.0.0"></script><script defer src="app.js?v=2.0.0"></script></head>
 <body>
-  <button id="lang-toggle" type="button"
-    style="position:fixed;bottom:12px;right:12px;z-index:999;padding:6px 12px;border:1px solid #4a90d9;background:#1a1a2e;color:#fff;border-radius:6px;cursor:pointer;font-weight:normal;"><b>中</b>
-    / EN</button>
-  <div id="header-pill">
-    <h1>LumenPnP Debug Tool</h1>
-  </div>
-  <button id="connect" type="button">Connect</button>
-  <div id="main-app">
-
-    <div id="control-pane">
-      <div id="control">
-        <h2 style="width:100%">Control</h2>
-        <button id="left-air-on" class="thirdwidth" type="button">Left Air On</button>
-        <button id="right-air-on" class="thirdwidth" type="button">Right Air On</button>
-        <button id="ring-lights-on" class="thirdwidth" type="button">Ring Lights On</button>
-
-        <button id="left-air-off" class="thirdwidth" type="button">Left Air Off</button>
-        <button id="right-air-off" class="thirdwidth" type="button">Right Air Off</button>
-        <button id="ring-lights-off" class="thirdwidth" type="button">Ring Lights Off</button>
-
-        <button id="left-vac" class="thirdwidth" type="button">Left Vac</button>
-        <button id="right-vac" class="thirdwidth" type="button">Right Vac</button>
-        <button id="disable-steppers" class="thirdwidth" type="button">Disable Steppers</button>
-
-        <div id="jog-pane">
-          <button id="home-x" class="fifthwidth" type="button">Home X</button>
-          <button id="home-y" class="fifthwidth" type="button">Home Y</button>
-          <button id="home-z" class="fifthwidth" type="button">Home Z</button>
-          <button id="jog-max" class="fifthwidth" type="button">Jog Max</button>
-          <button id="jog-min" class="fifthwidth" type="button">Jog Min</button>
-        </div>
-
-      </div>
-      <div id="repl">
-        <div id="console"></div>
-        <button id="send" type="button">Send</button>
-        <input id="repl-input" type="text" placeholder="Send Gcode" />
-      </div>
-
-    </div>
-    <div id="feeders">
-      <h2>Feeders</h2>
-
-      <div id="feeder-button-cluster">
-        <button style="width:150px;margin-top:0px;" id="more-controls">More Controls</button>
-        <button style="width:150px;margin-top:0px;" id="program-slots">Program Slots</button>
-        <button style="width:150px;margin-top:0px;" id="feeder-scan">Scan</button>
-      </div>
-
-      <div style="display:none;" id="found-feeders"></div>
-
-
-      <div style="display:none;" class="feeder-pane" id="unicast">
-        <h3>Unicast</h3>
-        <label>Command: </label>
-        <select style="height:1.5em;" id="uni-command" name="uni-command">
-          <option value="0x01">Get Feeder ID</option>
-          <option value="0x02">Initialize Feeder</option>
-          <option value="0x03">Get Version</option>
-          <option value="0x04">Move Feed Forward</option>
-          <option value="0x05">Move Feed Backward</option>
-          <option value="0x06">Move Feed Status</option>
-          <option value="0xbf">Vendor Options</option>
-        </select>
-        <label>To Address: </label>
-        <input id="uni-to" type="number" min="1" max="255" />
-        <label style="display:none;" id="uni-payload-label">Payload (in Hex): </label>
-        <input style="display:none;" id="uni-payload" type="text" placeholder="Payload" />
-        <button id="uni-send">Send</button>
-      </div>
-      <div style="display:none;" class="feeder-pane" id="broadcast">
-        <h3>Broadcast</h3>
-        <label>Command:</label>
-        <select style="height:1.5em;" id="broad-command" name="broad-command">
-          <option value="0xc0">Get Feeder Address</option>
-          <option value="0xc1">Identify Feeder</option>
-          <option value="0xc2">Program Feeder Floor</option>
-          <option value="0xc3">Uninitialized Feeders Respond</option>
-        </select>
-        <label>UUID (Hex String): </label>
-        <input id="broad-uuid" type="text" />
-        <label>Address to Program: </label>
-        <input id="broad-program-address" type="number" min="1" max="254" />
-        <button id="broad-send">Send</button>
-
-      </div>
-      <div style="display:none;" class="feeder-pane" id="custom-packet">
-        <h3>Custom Packet</h3>
-        <input id="custom-to" type="number" placeholder="To Address" />
-        <input id="custom-command" type="number" placeholder="Command" />
-        <input id="custom-payload" type="text" placeholder="Payload (hex string)" />
-        <button id="custom-send">Send</button>
-
-      </div>
-      <div style="display:none;" class="feeder-pane" id="crc-tool">
-        <h3>CRC Tool</h3>
-        <input id="calc-to" type="text" placeholder="To Address" />
-        <input id="calc-from" type="text" placeholder="From Address)" />
-        <input id="calc-packetid" type="text" placeholder="Packet ID" />
-        <input id="calc-payload-length" type="text" placeholder="Payload Length (including command byte)" />
-        <input id="calc-command" type="text" placeholder="Command" />
-        <input id="calc-payload" type="text" placeholder="Payload" />
-        <button id="calc-calculate">Calculate</button>
-
-
-      </div>
-
-      <div style="display:none;" class="feeder-pane" id="flash-at-fifty">
-        <h3>Flash at 50</h3>
-        <button id="flash-fifty-button">Flash</button>
-
-      </div>
-
-
-
-    </div>
-
-    <div id="testing">
-      <h2 style="width:100%">Tests</h2>
-      <button id="tmc" type="button">Test TMC Drivers</button>
-      <button id="vac" type="button">Test Vacuum Sensors</button>
-    </div>
-
-
-  </div>
-  <div id="footer"><img src="/assets/opulo-gold-alpha-tiny-DUNq2d90.png"></div>
-
-  <div id="modal">
-    <div class="flex">
-      <img src="/assets/lumen-icon-wA_suQRQ.png">
-      <button id="modal-close" class="btn-close">⨉</button>
-
-    </div>
-
-    <h2 id="modal-title">test</h2>
-    <p id="modal-content">test</p>
-    <input id="modal-num-input" min="1" max="254" type="number">
-    <div class="flex">
-      <button id="modal-ng">Cancel</button>
-      <button id="modal-ok">OK</button>
-    </div>
-
-
-
-
-
-  </div>
-  <div id="overlay"></div>
-
-  <script>
-    (function () {
-      var LS = window.localStorage, lang = 'zh'
-      try { lang = LS.getItem('ldLang') || 'zh' } catch (e) { }
-      var btn = document.getElementById('lang-toggle')
-      // [selector, 中文, 标记: ph 表示 placeholder]
-      var data = [
-        ['#header-pill h1', 'LumenPnP 调试工具'],
-        ['#connect', '连接'],
-        ['#control-pane h2', '控制'],
-        ['#left-air-on', '左侧气阀开'], ['#right-air-on', '右侧气阀开'], ['#ring-lights-on', '环形灯开'],
-        ['#left-air-off', '左侧气阀关'], ['#right-air-off', '右侧气阀关'], ['#ring-lights-off', '环形灯关'],
-        ['#left-vac', '左真空'], ['#right-vac', '右真空'], ['#disable-steppers', '禁用步进电机'],
-        ['#home-x', '回原点 X'], ['#home-y', '回原点 Y'], ['#home-z', '回原点 Z'],
-        ['#jog-max', '点动到最大'], ['#jog-min', '点动到最小'],
-        ['#repl-input', '发送 G 代码', 'ph'], ['#send', '发送'],
-        ['#feeders h2', '供料器'], ['#more-controls', '更多控制'], ['#program-slots', '编程卡位'], ['#feeder-scan', '扫描'],
-        ['#unicast h3', '单播'], ['#broadcast h3', '广播'], ['#custom-packet h3', '自定义数据包'], ['#crc-tool h3', 'CRC 工具'], ['#flash-at-fifty h3', '50Hz 闪烁'],
-        ['#uni-send', '发送'], ['#broad-send', '发送'], ['#custom-send', '发送'], ['#flash-fifty-button', '闪烁'], ['#calc-calculate', '计算'],
-        ['#testing h2', '测试'], ['#tmc', '测试 TMC 驱动'], ['#vac', '测试真空传感器'],
-        ['#modal-ng', '取消'], ['#modal-ok', '确定']
-      ]
-      // 标签文本切换 [容器选择器, 英文原文, 中文]
-      var lbl = [
-        ['#unicast', 'Command:', '命令：'], ['#unicast', 'To Address:', '目标地址：'], ['#unicast', 'Payload (in Hex):', '负载(十六进制)：'],
-        ['#broadcast', 'UUID (Hex String):', 'UUID(十六进制字符串)：'], ['#broadcast', 'Address to Program:', '要编程的地址：']
-      ]
-      // 下拉选项切换 [选择器, value, 中文]
-      var opt = [
-        ['#uni-command', '0x01', '获取供料器 ID'], ['#uni-command', '0x02', '初始化供料器'], ['#uni-command', '0x03', '获取版本'],
-        ['#uni-command', '0x04', '向前进料'], ['#uni-command', '0x05', '向后进料'], ['#uni-command', '0x06', '进料状态'], ['#uni-command', '0xbf', '厂商选项'],
-        ['#broad-command', '0xc0', '获取供料器地址'], ['#broad-command', '0xc1', '识别供料器'], ['#broad-command', '0xc2', '编程供料器地址'], ['#broad-command', '0xc3', '未初始化供料器响应']
-      ]
-      function apply() {
-        document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en'
-        data.forEach(function (d) {
-          var el = document.querySelector(d[0]); if (!el) return
-          if (d[2] === 'ph') { if (!('_ph' in el)) el._ph = el.placeholder; el.placeholder = lang === 'zh' ? d[1] : el._ph }
-          else { if (!('_t' in el)) el._t = el.textContent; el.textContent = lang === 'zh' ? d[1] : el._t }
-        })
-        lbl.forEach(function (p) {
-          document.querySelectorAll(p[0] + ' label').forEach(function (el) {
-            var t = el.textContent.trim()
-            if (t === p[1] || t === p[2]) el.textContent = lang === 'zh' ? p[2] : p[1]
-          })
-        })
-        opt.forEach(function (p) {
-          document.querySelectorAll(p[0] + ' option').forEach(function (el) {
-            if (el.value === p[1]) { if (!('_t' in el)) el._t = el.textContent; el.textContent = lang === 'zh' ? p[2] : el._t }
-          })
-        })
-        btn.innerHTML = lang === 'zh' ? '<b>中</b> / EN' : '中 / <b>EN</b>'
-        try { LS.setItem('ldLang', lang) } catch (e) { }
-      }
-      btn.addEventListener('click', function () { lang = lang === 'zh' ? 'en' : 'zh'; apply() })
-      apply()
-
-      // ===== 弹窗翻译:拦截原生 alert + 监听页面 modal 文字变化 =====
-      // alert 弹窗翻译映射 [英文, 中文]
-      var alertMap = [
-        ['Cannot write to port. Have you connected?', '无法写入串口。你已连接了吗？']
-      ]
-      var origAlert = window.alert
-      window.alert = function (s) {
-        if (lang === 'zh' && typeof s === 'string') alertMap.forEach(function (p) { s = s.split(p[0]).join(p[1]) })
-        return origAlert.call(window, s)
-      }
-      // modal 弹窗标题翻译映射
-      var titleMap = [
-        ['Cannot Write', '无法写入'], ['Invalid Packet', '无效数据包'], ['Photon Support', 'Photon 支持'],
-        ['CRC Result', 'CRC 结果'], ['Before Beginning', '开始之前'], ['Insert a Feeder', '插入供料器'],
-        ['Programming Feeder Not Found', '未检测到供料器'], ['Success', '成功'], ['Failure', '失败'],
-        ['Firmware Version of Feeder at Slot ', '固件版本 - 卡位 ']
-      ]
-      // modal 弹窗内容翻译映射(子串替换,可处理动态拼接的句子)
-      var contentMap = [
-        ['Cannot write to port. Have you connected?', '无法写入串口。你已连接了吗？'],
-        ['We did not receive a valid packet.', '未收到有效的数据包。'],
-        ['Your version of Marlin does not support Photon. Please update Marlin to the version in the ', '你的 Marlin 固件不支持 Photon。请更新到 '],
-        ['latest LumenPnP release', '最新 LumenPnP 发布版'],
-        [' using the instructions ', ' ，操作教程见 '],
-        ['here', '这里'],
-        ["To program your slots, first remove all Photon feeders from your machine. Once you've done this, click ok.", '编程前请先从机器上取下所有 Photon 供料器，完成后点击确定。'],
-        ["If at any point you'd like to exit this utility, click cancel.", '如需随时退出此向导，请点击取消。'],
-        ["Insert a feeder into the slot you'd like to program. Enter the address you'd like to program in the field below. Once you've done this, click ok.", '把供料器插入要编程的卡位，在下方输入想要设置的地址，然后点击确定。'],
-        ['The feeder you inserted was not detected.', '未检测到你插入的供料器。'],
-        ['Slot has been programmed with address ', '卡位已编程为地址 '],
-        ['! Remove the feeder from the slot, then click OK to program another.', ' ！请取下供料器，再点击确定继续编程下一个。'],
-        ['Programming Failed for slot ', '卡位编程失败：'],
-        ['. Click OK to retry.', ' 。点击确定重试。'],
-        ['Firmware is 1.3 or earlier, update feeder firmware to use this feature.', '该供料器固件为 1.3 或更早版本，请升级固件以使用此功能。']
-      ]
-      // 对字符串做子串替换(仅中文模式生效)
-      function tr(s, map) {
-        if (lang !== 'zh' || typeof s !== 'string') return s
-        map.forEach(function (p) { s = s.split(p[0]).join(p[1]) })
-        return s
-      }
-      // 监听 modal 内容变化并动态翻译(mutings 标志防止修改文字再次触发观察器造成死循环)
-      var mutings = false
-      new MutationObserver(function () {
-        if (mutings) return
-        var t = document.getElementById('modal-title'), c = document.getElementById('modal-content')
-        mutings = true
-        try {
-          if (t) { var a = tr(t.textContent, titleMap); if (a !== t.textContent) t.textContent = a }
-          if (c) { var b = tr(c.innerHTML, contentMap); if (b !== c.innerHTML) c.innerHTML = b }
-        } finally { mutings = false }
-      }).observe(document.getElementById('modal'), { childList: true, subtree: true, characterData: true })
-    })();
-  </script>
-
-</body>
-
-</html>
+<header><div class="brandmark">L<span>▦</span></div><div><h1>LumenPnP <span>硬件调试台</span></h1><p>HARDWARE BENCH <b>v2.0.0</b></p></div><div class="header-right"><span id="connection-status" class="badge">● 未连接</span><button id="theme-toggle" aria-label="切换明亮与黑暗模式" aria-pressed="false">☀ 明亮模式</button><button id="settings-open">⚙ 指令配置</button></div></header>
+<main>
+<section class="connection panel"><div class="section-title"><span class="index">01</span><h2>设备连接</h2><span class="muted">LumenPnP / Marlin</span></div><div class="connect-controls"><label>运行模式<select id="mode"><option value="demo">演示 · 不连接硬件</option><option value="serial">真实设备 · USB 串口</option></select></label><label>波特率<select id="baud"><option>115200</option><option>250000</option><option>57600</option><option>230400</option><option>500000</option><option>1000000</option></select></label><button id="connect" class="primary">连接演示设备</button><button id="disconnect" disabled>断开连接</button><label class="check"><input id="armed" type="checkbox">允许硬件控制</label></div><p id="connection-note" class="note">演示模式仅模拟指令响应与坐标。真实串口与摄像头请用 Chrome / Edge 打开 localhost 页面。</p><p id="arm-note" class="note" hidden>启用前核对指令配置及 P0–P3 接线，关闭 OpenPnP 以释放串口。断开连接不会关闭机器输出。</p></section>
+<div class="workspace">
+<div class="controls-column">
+<section class="panel motion-panel"><div class="section-title"><span class="index">02</span><h2>轴运动控制</h2><span class="badge subtle">mm</span></div><div class="motion-options"><label>XY 速度 <span class="muted">mm/min</span><input id="feed" type="number" value="1000" min="1" max="10000" step="1"></label><label>Z 速度 <span class="muted">mm/min</span><input id="feed-z" type="number" value="300" min="1" max="10000" step="1"></label></div><div id="axis-readouts" class="axis-readouts"></div><div id="axes"></div><div id="stop-notice" class="stop-notice" hidden><span id="stop-message"></span><button id="resume-control" type="button">解除急停</button></div><p id="position-source" class="note">坐标尚未读取</p><div class="action-row"><button data-command="position" data-hardware>↻ 读取坐标</button><button data-command="motorOff" class="warning" data-hardware>关闭电机</button></div><p class="note">点击方向箭头执行一次点动；圆环数字选择 XY 步长，右侧数字选择 Z 步长。Z 轴移动前检查两侧吸嘴空间。<b>键盘：</b>方向键（或 W A S D）控制 XY，PageUp / PageDown 控制 Z；按住连续点动，松手立即停止。</p></section>
+<section class="panel preset-panel"><div class="section-title"><span class="index">03</span><h2>位置预设</h2><span id="preset-count" class="badge subtle">0 个</span></div><div class="preset-add"><input id="preset-name" placeholder="预设名称，例如 PCB 原点" maxlength="40" aria-label="新预设名称"><button id="preset-save" class="primary">＋ 保存当前位置</button></div><div id="presets" class="preset-list"></div><p class="note">先点「读取坐标」，读出 X / Y / Z 之后再保存。前往时先走 XY、再走 Z，两段之间有 M400 等待；需要先抬 Z、经过中间点或做多步动作时，请改用宏。同名保存会覆盖原预设，预设随「导出全部设置」一起备份。</p></section><section class="panel endstop-panel"><div class="section-title"><span class="index">04</span><h2>限位状态检测</h2><button id="endstop-query" data-endstops class="small">检测限位状态</button></div><div id="endstop-states" class="endstop-grid" aria-live="polite"></div><p id="endstop-status" class="note" role="status">尚未检测</p><p class="note">按下或松开限位开关后再次检测。M119 只读取输入状态，不移动电机；未回报的输入显示为未知。</p></section><section class="panel nozzle-panel"><div class="section-title"><span class="index">05</span><h2>吸嘴旋转测试</h2><span class="badge subtle">A / B · °</span></div><div id="nozzles" class="nozzle-grid"></div><p class="note">顺 / 逆时针按每次角度点动；“转到角度”按控制器绝对角度定位。方向相反可在指令配置翻转。</p></section>
+<section class="panel"><div class="section-title"><span class="index">06</span><h2>照明控制</h2><span id="light-mode" class="badge subtle">上下联动</span></div><div id="lights"></div><div class="action-row"><button id="lights-on" data-hardware>☀ 全部照明开启</button><button id="lights-off" data-hardware>全部照明关闭</button></div></section>
+<section class="panel"><div class="section-title"><span class="index">07</span><h2>气路测试</h2><span class="muted">独立输出</span></div><div class="pneumatic-head"><span>左侧 · VAC1</span><span>右侧 · VAC2</span></div><div id="pneumatics" class="pneumatics"></div><p class="note">显示的是指令确认状态，未采集压力或物理开关反馈。气泵和阀门可分别测试。力度滑块写入开指令的 S 值（0–255，即 M106 功率）；输出已打开时松开滑块会立即按新力度重发一次。</p></section>
+</div>
+<div class="vision-column">
+<section class="panel vision-panel"><div class="section-title"><span class="index">08</span><h2>双摄像头监视</h2><button id="camera-refresh" class="small">授权 / 刷新摄像头</button></div><p id="camera-discovery" class="note" role="status">正在获取浏览器摄像头列表…</p><div id="cameras"></div><details class="note"><summary>列表缺少摄像头时如何检查</summary><p>使用桌面 Chrome / Edge 打开 http://localhost:8765/，点击“授权 / 刷新摄像头”并允许本站访问摄像头。检查地址栏的摄像头权限，以及 Windows 设置 → 隐私和安全性 → 摄像头中的访问权限和桌面应用访问权限。关闭占用摄像头的 OpenPnP、会议软件或其他网页后重试。</p><p>设备管理器列出的数量不一定等于浏览器可访问的数量。若仍少于预期，请导出下方日志中的“摄像头枚举”记录，并提供浏览器名称和版本。工具不会自动切换到未找到的已保存摄像头。</p></details><p class="note">摄像头与设备连接独立。上摄像头朝下看 PCB，下摄像头朝上看吸嘴；请根据实际画面选择设备。</p></section>
+<section class="panel console-panel"><div class="section-title"><span class="index">09</span><h2>指令终端</h2><div class="console-tools"><button id="macros-open" class="small">宏</button><button id="export-log" class="small">导出日志</button><button id="clear-log" class="small">清空</button></div></div><div id="log" role="log" aria-label="串口收发日志"></div><form id="command-form"><input id="manual-command" placeholder="输入 G-code，例如 M115 或 M119" aria-label="手动 G-code" autocomplete="off" maxlength="512"><button class="primary" data-hardware>发送 ↗</button></form><div class="quick-commands"><button data-literal="M115" data-hardware>固件信息</button><button data-endstops>限位状态</button><div id="macro-bar" class="macro-bar"></div><span id="operation-status">等待连接</span></div></section>
+</div>
+</div>
+<section class="panel feeder-panel"><div class="section-title"><span class="index">10</span><h2>供料器总线</h2><span class="badge subtle">Photon · RS485</span></div>
+<p class="note">主控把 <code>M485</code> 转发到 RS485 供料器总线，应答走 <code>rs485-reply</code>。需要 Photon 版 Marlin 固件；未启用该功能的固件会明确报错而不是静默失败。地址范围 1–254，广播固定 255，ID 为 12 字节（24 位十六进制）。</p>
+<div class="feeder-tools"><button id="feeder-scan" class="primary" data-hardware>扫描供料器</button><button id="feeder-program" data-hardware>编程卡位向导</button><button id="feeder-flash" data-hardware>定位 50 号位供料器</button><span id="feeder-status" class="muted" role="status">尚未扫描</span></div>
+<div id="found-feeders" class="found-feeders"></div>
+<details class="feeder-more"><summary>手动指令与校验和工具</summary>
+<div class="feeder-forms">
+<div class="feeder-form"><h3>单播</h3><label>指令<select id="uni-command"></select></label><label>目标地址<input id="uni-address" type="number" min="1" max="254" value="1"></label><label id="uni-payload-label">载荷（十六进制）<input id="uni-payload" placeholder="例如 2800" autocomplete="off"></label><button id="uni-send" data-hardware>发送单播</button></div>
+<div class="feeder-form"><h3>广播</h3><label>指令<select id="broad-command"></select></label><label>UUID（24 位十六进制）<input id="broad-uuid" maxlength="24" placeholder="供料器 ID" autocomplete="off"></label><label id="broad-address-label">要编程的地址<input id="broad-address" type="number" min="1" max="254" value="1"></label><button id="broad-send" data-hardware>发送广播</button></div>
+<div class="feeder-form"><h3>自定义数据包</h3><label>目标地址<input id="custom-address" type="number" min="1" max="254" value="1"></label><label>指令码（十进制）<input id="custom-command" type="number" min="0" max="255" value="1"></label><label>载荷（十六进制）<input id="custom-payload" placeholder="可留空" autocomplete="off"></label><button id="custom-send" data-hardware>发送数据包</button></div>
+<div class="feeder-form"><h3>校验和工具</h3><label>目标地址<input id="calc-to" type="number" min="0" max="255" value="1"></label><label>来源地址<input id="calc-from" type="number" min="0" max="255" value="0"></label><label>包 ID<input id="calc-packet" type="number" min="0" max="255" value="0"></label><label>载荷长度<input id="calc-length" type="number" min="1" max="255" value="1"></label><label>指令码<input id="calc-command" type="number" min="0" max="255" value="1"></label><label>载荷（十六进制）<input id="calc-payload" placeholder="可留空" autocomplete="off"></label><div class="action-row"><button id="calc-run">计算校验和</button></div><output id="calc-result" class="feeder-result">—</output></div>
+</div></details>
+<div id="feeder-result" class="feeder-result" role="status">尚无应答</div>
+<p class="note">扫描会依次查询 1–50 号位并尝试初始化，只列出真正应答的供料器。仿真模式下由内置的虚拟供料器总线应答，可离线试用全部按钮。</p></section>
+<section class="panel selftest-panel"><div class="section-title"><span class="index">11</span><h2>硬件自检</h2><span class="badge subtle">M122 · 真空 ADC</span></div>
+<div class="selftest-grid">
+<div class="selftest-card"><h3>步进驱动（TMC）</h3><p class="note">发送 <code>M122</code> 读取驱动寄存器与状态，等待串口安静后收集完整报告，可导出为文本。</p><div class="action-row"><button id="tmc-run" data-hardware>运行检测</button><button id="tmc-download" disabled>导出报告</button></div><pre id="tmc-output" class="selftest-output">尚未运行</pre></div>
+<div class="selftest-card"><h3>真空传感器</h3><p class="note">经 I2C 桥读取 24 位有符号值：先 <code>M260 A112 B1/B2 S1</code> 选通道，再顺序读寄存器 6 / 7 / 8。</p><div class="action-row"><button id="vac-left" data-hardware>读取左侧</button><button id="vac-right" data-hardware>读取右侧</button><button id="vac-both" data-hardware>两侧连读</button></div><div class="vac-readouts"><div class="vac-card"><b>左侧 · VAC1</b><span id="vac-value-left">—</span></div><div class="vac-card"><b>右侧 · VAC2</b><span id="vac-value-right">—</span></div></div><div class="action-row"><button id="vac-boot" data-hardware>发送官方启动序列</button><button id="vac-download" disabled>导出报告</button></div><pre id="vac-output" class="selftest-output">尚未读取</pre><p class="note">启动序列会写 I2C 寄存器，因此连接时不会自动发送，只在你点击时执行。</p></div>
+</div></section>
+<dialog id="feeder-wizard"><form id="feeder-wizard-form"><div class="section-title"><h2 id="wizard-title">编程卡位</h2><span class="badge subtle" id="wizard-step">第 1 步</span></div><p id="wizard-message" class="note"></p><label id="wizard-input-label">要编程的地址<input id="wizard-input" type="number" min="1" max="254" value="1"></label><div class="settings-actions"><button type="button" id="wizard-cancel">取消</button><button class="primary" id="wizard-ok" type="submit">确定</button></div></form></dialog>
+<footer><span id="settings-status">设置自动保存 · 本地运行</span><span>软件急停发送 M410，保持串口连接；快速响应需固件启用 Emergency Parser。</span><a href="https://docs.opulo.io/byop/testing/actuator-check/" target="_blank" rel="noopener">Opulo 指令参考 ↗</a></footer>
+</main>
+<dialog id="settings"><form id="settings-form"><div class="section-title"><h2>指令与通信配置</h2><button type="button" id="settings-close">关闭 ✕</button></div><p class="note">预置：Marlin 点动 / 回零；P0 左泵、P1 左阀、P2 右泵、P3 右阀。先核对实际接线。上下灯默认共用 M150。每行一条指令；这里的占位符与 OpenPnP 格式不同。</p><div id="config-fields"></div><div class="settings-actions"><button type="button" id="config-reset">恢复 LumenPnP 预设</button><button type="button" id="config-export">导出全部设置</button><label class="file-button">导入 JSON<input id="config-import" type="file" accept=".json,application/json" hidden></label><button class="primary" type="submit">保存全部设置</button></div><p class="note">配置保存在当前浏览器；仅断开设备后可修改。默认 M410 快速停止；M112 会进入需复位的停机状态。</p></form></dialog>
+<dialog id="macros"><form id="macros-form"><div class="section-title"><h2>宏指令序列</h2><button type="button" id="macros-close">关闭 ✕</button></div><p class="note">每行一条 G-code，以 <code>;</code> 开头的行为注释。可用占位符：<code>{X}</code> <code>{Y}</code> <code>{Z}</code>（当前坐标，需先读取坐标）、<code>{xyStep}</code> <code>{zStep}</code>、<code>{feed}</code> <code>{feedZ}</code>。占位符在发送前替换；这里的写法与上方「指令配置」里的 OpenPnP 风格格式互不影响。名称为空或指令为空的条目在保存时会被丢弃。</p><div id="macro-fields" class="macro-fields"></div><div class="settings-actions"><button type="button" id="macro-add">＋ 新增宏</button><button type="button" id="macro-reset">清空全部宏</button><button class="primary" type="submit">保存宏</button></div><p class="note">宏按钮与「允许硬件控制」联动，未启用控制时不可点击。宏保存在当前浏览器，并随「导出全部设置」一起备份。</p></form></dialog>
+<div id="toast" role="status"></div>
+</body></html>

@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/lumen-icon-wA_suQRQ.png">
+  <link rel="shortcut icon" type="image/x-icon" href="assets/lumen-icon-wA_suQRQ.png">
+  <title>LumenPnP Debug</title>
+  <script type="module" crossorigin src="assets/index-qQ3PqOnW.js"></script>
+  <link rel="stylesheet" crossorigin href="assets/index-lY3jZAel.css">
+</head>
+
+<body>
+  <button id="lang-toggle" type="button"
+    style="position:fixed;bottom:12px;right:12px;z-index:999;padding:6px 12px;border:1px solid #4a90d9;background:#1a1a2e;color:#fff;border-radius:6px;cursor:pointer;font-weight:normal;"><b>中</b>
+    / EN</button>
+  <div id="header-pill">
+    <h1>LumenPnP Debug Tool</h1>
+  </div>
+  <button id="connect" type="button">Connect</button>
+  <div id="main-app">
+
+    <div id="control-pane">
+      <div id="control">
+        <h2 style="width:100%">Control</h2>
+        <button id="left-air-on" class="thirdwidth" type="button">Left Air On</button>
+        <button id="right-air-on" class="thirdwidth" type="button">Right Air On</button>
+        <button id="ring-lights-on" class="thirdwidth" type="button">Ring Lights On</button>
+
+        <button id="left-air-off" class="thirdwidth" type="button">Left Air Off</button>
+        <button id="right-air-off" class="thirdwidth" type="button">Right Air Off</button>
+        <button id="ring-lights-off" class="thirdwidth" type="button">Ring Lights Off</button>
+
+        <button id="left-vac" class="thirdwidth" type="button">Left Vac</button>
+        <button id="right-vac" class="thirdwidth" type="button">Right Vac</button>
+        <button id="disable-steppers" class="thirdwidth" type="button">Disable Steppers</button>
+
+        <div id="jog-pane">
+          <button id="home-x" class="fifthwidth" type="button">Home X</button>
+          <button id="home-y" class="fifthwidth" type="button">Home Y</button>
+          <button id="home-z" class="fifthwidth" type="button">Home Z</button>
+          <button id="jog-max" class="fifthwidth" type="button">Jog Max</button>
+          <button id="jog-min" class="fifthwidth" type="button">Jog Min</button>
+        </div>
+
+      </div>
+      <div id="repl">
+        <div id="console"></div>
+        <button id="send" type="button">Send</button>
+        <input id="repl-input" type="text" placeholder="Send Gcode" />
+      </div>
+
+    </div>
+    <div id="feeders">
+      <h2>Feeders</h2>
+
+      <div id="feeder-button-cluster">
+        <button style="width:150px;margin-top:0px;" id="more-controls">More Controls</button>
+        <button style="width:150px;margin-top:0px;" id="program-slots">Program Slots</button>
+        <button style="width:150px;margin-top:0px;" id="feeder-scan">Scan</button>
+      </div>
+
+      <div style="display:none;" id="found-feeders"></div>
+
+
+      <div style="display:none;" class="feeder-pane" id="unicast">
+        <h3>Unicast</h3>
+        <label>Command: </label>
+        <select style="height:1.5em;" id="uni-command" name="uni-command">
+          <option value="0x01">Get Feeder ID</option>
+          <option value="0x02">Initialize Feeder</option>
+          <option value="0x03">Get Version</option>
+          <option value="0x04">Move Feed Forward</option>
+          <option value="0x05">Move Feed Backward</option>
+          <option value="0x06">Move Feed Status</option>
+          <option value="0xbf">Vendor Options</option>
+        </select>
+        <label>To Address: </label>
+        <input id="uni-to" type="number" min="1" max="255" />
+        <label style="display:none;" id="uni-payload-label">Payload (in Hex): </label>
+        <input style="display:none;" id="uni-payload" type="text" placeholder="Payload" />
+        <button id="uni-send">Send</button>
+      </div>
+      <div style="display:none;" class="feeder-pane" id="broadcast">
+        <h3>Broadcast</h3>
+        <label>Command:</label>
+        <select style="height:1.5em;" id="broad-command" name="broad-command">
+          <option value="0xc0">Get Feeder Address</option>
+          <option value="0xc1">Identify Feeder</option>
+          <option value="0xc2">Program Feeder Floor</option>
+          <option value="0xc3">Uninitialized Feeders Respond</option>
+        </select>
+        <label>UUID (Hex String): </label>
+        <input id="broad-uuid" type="text" />
+        <label>Address to Program: </label>
+        <input id="broad-program-address" type="number" min="1" max="254" />
+        <button id="broad-send">Send</button>
+
+      </div>
+      <div style="display:none;" class="feeder-pane" id="custom-packet">
+        <h3>Custom Packet</h3>
+        <input id="custom-to" type="number" placeholder="To Address" />
+        <input id="custom-command" type="number" placeholder="Command" />
+        <input id="custom-payload" type="text" placeholder="Payload (hex string)" />
+        <button id="custom-send">Send</button>
+
+      </div>
+      <div style="display:none;" class="feeder-pane" id="crc-tool">
+        <h3>CRC Tool</h3>
+        <input id="calc-to" type="text" placeholder="To Address" />
+        <input id="calc-from" type="text" placeholder="From Address)" />
+        <input id="calc-packetid" type="text" placeholder="Packet ID" />
+        <input id="calc-payload-length" type="text" placeholder="Payload Length (including command byte)" />
+        <input id="calc-command" type="text" placeholder="Command" />
+        <input id="calc-payload" type="text" placeholder="Payload" />
+        <button id="calc-calculate">Calculate</button>
+
+
+      </div>
+
+      <div style="display:none;" class="feeder-pane" id="flash-at-fifty">
+        <h3>Flash at 50</h3>
+        <button id="flash-fifty-button">Flash</button>
+
+      </div>
+
+
+
+    </div>
+
+    <div id="testing">
+      <h2 style="width:100%">Tests</h2>
+      <button id="tmc" type="button">Test TMC Drivers</button>
+      <button id="vac" type="button">Test Vacuum Sensors</button>
+    </div>
+
+
+  </div>
+  <div id="footer"><img src="assets/opulo-gold-alpha-tiny-DUNq2d90.png"></div>
+
+  <div id="modal">
+    <div class="flex">
+      <img src="assets/lumen-icon-wA_suQRQ.png">
+      <button id="modal-close" class="btn-close">⨉</button>
+
+    </div>
+
+    <h2 id="modal-title">test</h2>
+    <p id="modal-content">test</p>
+    <input id="modal-num-input" min="1" max="254" type="number">
+    <div class="flex">
+      <button id="modal-ng">Cancel</button>
+      <button id="modal-ok">OK</button>
+    </div>
+
+
+
+
+
+  </div>
+  <div id="overlay"></div>
+
+  <script>
+    (function () {
+      var LS = window.localStorage, lang = 'zh'
+      try { lang = LS.getItem('ldLang') || 'zh' } catch (e) { }
+      var btn = document.getElementById('lang-toggle')
+      // [selector, 中文, 标记: ph 表示 placeholder]
+      var data = [
+        ['#header-pill h1', 'LumenPnP 调试工具'],
+        ['#connect', '连接'],
+        ['#control-pane h2', '控制'],
+        ['#left-air-on', '左侧气阀开'], ['#right-air-on', '右侧气阀开'], ['#ring-lights-on', '环形灯开'],
+        ['#left-air-off', '左侧气阀关'], ['#right-air-off', '右侧气阀关'], ['#ring-lights-off', '环形灯关'],
+        ['#left-vac', '左真空'], ['#right-vac', '右真空'], ['#disable-steppers', '禁用步进电机'],
+        ['#home-x', '回原点 X'], ['#home-y', '回原点 Y'], ['#home-z', '回原点 Z'],
+        ['#jog-max', '点动到最大'], ['#jog-min', '点动到最小'],
+        ['#repl-input', '发送 G 代码', 'ph'], ['#send', '发送'],
+        ['#feeders h2', '供料器'], ['#more-controls', '更多控制'], ['#program-slots', '编程卡位'], ['#feeder-scan', '扫描'],
+        ['#unicast h3', '单播'], ['#broadcast h3', '广播'], ['#custom-packet h3', '自定义数据包'], ['#crc-tool h3', 'CRC 工具'], ['#flash-at-fifty h3', '50Hz 闪烁'],
+        ['#uni-send', '发送'], ['#broad-send', '发送'], ['#custom-send', '发送'], ['#flash-fifty-button', '闪烁'], ['#calc-calculate', '计算'],
+        ['#testing h2', '测试'], ['#tmc', '测试 TMC 驱动'], ['#vac', '测试真空传感器'],
+        ['#modal-ng', '取消'], ['#modal-ok', '确定']
+      ]
+      // 标签文本切换 [容器选择器, 英文原文, 中文]
+      var lbl = [
+        ['#unicast', 'Command:', '命令：'], ['#unicast', 'To Address:', '目标地址：'], ['#unicast', 'Payload (in Hex):', '负载(十六进制)：'],
+        ['#broadcast', 'UUID (Hex String):', 'UUID(十六进制字符串)：'], ['#broadcast', 'Address to Program:', '要编程的地址：']
+      ]
+      // 下拉选项切换 [选择器, value, 中文]
+      var opt = [
+        ['#uni-command', '0x01', '获取供料器 ID'], ['#uni-command', '0x02', '初始化供料器'], ['#uni-command', '0x03', '获取版本'],
+        ['#uni-command', '0x04', '向前进料'], ['#uni-command', '0x05', '向后进料'], ['#uni-command', '0x06', '进料状态'], ['#uni-command', '0xbf', '厂商选项'],
+        ['#broad-command', '0xc0', '获取供料器地址'], ['#broad-command', '0xc1', '识别供料器'], ['#broad-command', '0xc2', '编程供料器地址'], ['#broad-command', '0xc3', '未初始化供料器响应']
+      ]
+      function apply() {
+        document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en'
+        data.forEach(function (d) {
+          var el = document.querySelector(d[0]); if (!el) return
+          if (d[2] === 'ph') { if (!('_ph' in el)) el._ph = el.placeholder; el.placeholder = lang === 'zh' ? d[1] : el._ph }
+          else { if (!('_t' in el)) el._t = el.textContent; el.textContent = lang === 'zh' ? d[1] : el._t }
+        })
+        lbl.forEach(function (p) {
+          document.querySelectorAll(p[0] + ' label').forEach(function (el) {
+            var t = el.textContent.trim()
+            if (t === p[1] || t === p[2]) el.textContent = lang === 'zh' ? p[2] : p[1]
+          })
+        })
+        opt.forEach(function (p) {
+          document.querySelectorAll(p[0] + ' option').forEach(function (el) {
+            if (el.value === p[1]) { if (!('_t' in el)) el._t = el.textContent; el.textContent = lang === 'zh' ? p[2] : el._t }
+          })
+        })
+        btn.innerHTML = lang === 'zh' ? '<b>中</b> / EN' : '中 / <b>EN</b>'
+        try { LS.setItem('ldLang', lang) } catch (e) { }
+      }
+      btn.addEventListener('click', function () { lang = lang === 'zh' ? 'en' : 'zh'; apply() })
+      apply()
+
+      // ===== 弹窗翻译:拦截原生 alert + 监听页面 modal 文字变化 =====
+      // alert 弹窗翻译映射 [英文, 中文]
+      var alertMap = [
+        ['Cannot write to port. Have you connected?', '无法写入串口。你已连接了吗？']
+      ]
+      var origAlert = window.alert
+      window.alert = function (s) {
+        if (lang === 'zh' && typeof s === 'string') alertMap.forEach(function (p) { s = s.split(p[0]).join(p[1]) })
+        return origAlert.call(window, s)
+      }
+      // modal 弹窗标题翻译映射
+      var titleMap = [
+        ['Cannot Write', '无法写入'], ['Invalid Packet', '无效数据包'], ['Photon Support', 'Photon 支持'],
+        ['CRC Result', 'CRC 结果'], ['Before Beginning', '开始之前'], ['Insert a Feeder', '插入供料器'],
+        ['Programming Feeder Not Found', '未检测到供料器'], ['Success', '成功'], ['Failure', '失败'],
+        ['Firmware Version of Feeder at Slot ', '固件版本 - 卡位 ']
+      ]
+      // modal 弹窗内容翻译映射(子串替换,可处理动态拼接的句子)
+      var contentMap = [
+        ['Cannot write to port. Have you connected?', '无法写入串口。你已连接了吗？'],
+        ['We did not receive a valid packet.', '未收到有效的数据包。'],
+        ['Your version of Marlin does not support Photon. Please update Marlin to the version in the ', '你的 Marlin 固件不支持 Photon。请更新到 '],
+        ['latest LumenPnP release', '最新 LumenPnP 发布版'],
+        [' using the instructions ', ' ，操作教程见 '],
+        ['here', '这里'],
+        ["To program your slots, first remove all Photon feeders from your machine. Once you've done this, click ok.", '编程前请先从机器上取下所有 Photon 供料器，完成后点击确定。'],
+        ["If at any point you'd like to exit this utility, click cancel.", '如需随时退出此向导，请点击取消。'],
+        ["Insert a feeder into the slot you'd like to program. Enter the address you'd like to program in the field below. Once you've done this, click ok.", '把供料器插入要编程的卡位，在下方输入想要设置的地址，然后点击确定。'],
+        ['The feeder you inserted was not detected.', '未检测到你插入的供料器。'],
+        ['Slot has been programmed with address ', '卡位已编程为地址 '],
+        ['! Remove the feeder from the slot, then click OK to program another.', ' ！请取下供料器，再点击确定继续编程下一个。'],
+        ['Programming Failed for slot ', '卡位编程失败：'],
+        ['. Click OK to retry.', ' 。点击确定重试。'],
+        ['Firmware is 1.3 or earlier, update feeder firmware to use this feature.', '该供料器固件为 1.3 或更早版本，请升级固件以使用此功能。']
+      ]
+      // 对字符串做子串替换(仅中文模式生效)
+      function tr(s, map) {
+        if (lang !== 'zh' || typeof s !== 'string') return s
+        map.forEach(function (p) { s = s.split(p[0]).join(p[1]) })
+        return s
+      }
+      // 监听 modal 内容变化并动态翻译(mutings 标志防止修改文字再次触发观察器造成死循环)
+      var mutings = false
+      new MutationObserver(function () {
+        if (mutings) return
+        var t = document.getElementById('modal-title'), c = document.getElementById('modal-content')
+        mutings = true
+        try {
+          if (t) { var a = tr(t.textContent, titleMap); if (a !== t.textContent) t.textContent = a }
+          if (c) { var b = tr(c.innerHTML, contentMap); if (b !== c.innerHTML) c.innerHTML = b }
+        } finally { mutings = false }
+      }).observe(document.getElementById('modal'), { childList: true, subtree: true, characterData: true })
+    })();
+  </script>
+
+</body>
+
+</html>
